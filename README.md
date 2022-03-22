@@ -1,1 +1,1 @@
-# Mecatronic-Hand
+# Mechatronic-Hand
