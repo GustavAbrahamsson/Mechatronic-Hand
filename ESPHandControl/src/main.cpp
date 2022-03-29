@@ -2,6 +2,9 @@
 #include <WiFi.h>
 #include <esp_now.h>
 #include <ESP32Servo.h>
+#include <stdio.h>
+
+
 
 enum joint{
   PIP_1,
