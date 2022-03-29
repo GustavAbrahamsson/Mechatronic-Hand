@@ -2,7 +2,6 @@
 #include <WiFi.h>
 #include <esp_now.h>
 #include <ESP32Servo.h>
-#include <stdio.h>
 
 
 
