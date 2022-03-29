@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../VisualStudio/CppTestCode"
+		},
+		{
+			"name": "MyServoTest",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
