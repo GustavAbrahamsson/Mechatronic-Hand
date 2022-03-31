@@ -14,7 +14,7 @@ float Kp=0.1, Ki=0, Kd=0;
 uint16_t setpoint = 150;
 float current_value;
 
-uint8_t command
+uint8_t command;
 
 MyPID MyPIDD(Kp, Ki, Kd);
 
@@ -26,10 +26,10 @@ void requestEvent(){
 void recieveEvent(int numbytes){
   command = Wire.read();
 
-  uint8_t buff[numBytes-1];
-  int i = 0
+  uint8_t buff[numbytes-1];
+  int i = 0;
   while(Wire.available()){
-    buff[i] = Wire.read()
+    buff[i] = Wire.read();
   }
 
   switch (command)
@@ -56,7 +56,7 @@ void setup() {
   pinMode(MOTOR2, OUTPUT);
   Wire.begin(I2CAddress);
   Wire.onRequest(requestEvent);
-  Wire.onRecieve(recieveEvent)
+  Wire.onReceive(recieveEvent);
 };
 
 void loop() {
