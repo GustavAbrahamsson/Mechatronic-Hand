@@ -2,17 +2,17 @@
 class MyPID
 {
 
-private:
-    float integral = 0;
-    float previous_error = 0;
-    float Kp;
-    float Ki;
-    float Kd;
-    
+    private:
+        float integral;
+        float previous_error;
+        float Kp;
+        float Ki;
+        float Kd;
+        
 
-public:
-    MyPID(float Kp, float Ki, float Kd);
-    float NextStep(float dt, float setpoint, float current_value);
+    public:
+        MyPID(float Kp, float Ki, float Kd);
+        float NextStep(float dt, float setpoint, float current_value);
 };
 
 MyPID::MyPID(float Kp, float Ki, float Kd)
@@ -34,7 +34,3 @@ float MyPID::NextStep(float dt, float setpoint, float current_value){
     this->previous_error = current_error;
     return output;
 }
-
-
-
-
