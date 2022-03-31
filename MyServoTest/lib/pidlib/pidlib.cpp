@@ -32,5 +32,12 @@ float MyPID::NextStep(float dt, float setpoint, float current_value){
     float derivative = (current_error - this->previous_error)/(dt/1000);
     float output = this->Kp*current_error + this->Ki*this->integral + this->Kd*derivative;
     this->previous_error = current_error;
+    
+    if (output > 255){
+        output = 255;
+    }
+    else if (output < -255){
+        output = -255;
+    }
     return output;
 }
