@@ -2,7 +2,7 @@
 #include <WiFi.h>
 #include <esp_now.h>
 #include <ESP32Servo.h>
-
+#include "MotorControl.h"
 
 
 enum joint{
@@ -98,27 +98,37 @@ void send (){
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  init_wifi();
-  getMACAdress();
+  Wire.begin();
 
-  // init all servos
-  for (int i = 0; i < 8; i++)
-  {
-    servos[i].setPeriodHertz(50); //50 Hz servo
-    servos[i].attach(servoPins[i], 500, 2500); //Attach correct pin and set limits
-  }
+  //init_wifi();
+  //getMACAdress();
+
+  // // init all servos
+  // for (int i = 0; i < 8; i++)
+  // {
+  //   servos[i].setPeriodHertz(50); //50 Hz servo
+  //   servos[i].attach(servoPins[i], 500, 2500); //Attach correct pin and set limits
+  // }
 }
 
 void loop() {
-  for (int i = 0; i < 8; i++)
-  {
-    int value = joint_positions[i];
-    if(value < 0){value = 0; }
-    if(value > 90){value = 90; }
+  // for (int i = 0; i < 8; i++)
+  // {
+  //   int value = joint_positions[i];
+  //   if(value < 0){value = 0; }
+  //   if(value > 90){value = 90; }
     
-    value = map(value, 0, 90, 0, maxServos[i]);
-    servos[i].write(value);
-  }
+  //   value = map(value, 0, 90, 0, maxServos[i]);
+  //   servos[i].write(value);
+  // }
 
-  delay(20);
+  // delay(20);
+
+  Serial.println("Write pos 50");
+  write_motor_pos(8, 50);
+  delay(500);
+
+  Serial.println("Write pos 200");
+  write_motor_pos(8, 200);
+  delay(500);
 }

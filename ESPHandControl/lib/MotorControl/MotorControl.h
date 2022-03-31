@@ -1,0 +1,1 @@
+void write_motor_pos(int addr, uint16_t pos);
