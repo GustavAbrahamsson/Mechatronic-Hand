@@ -2,14 +2,29 @@
 #include <Wire.h>
 #include "pidlib.h"
 
+// Comment the following line for ATtiny
+#define NANO
 
-#define MOTOR1 5
-#define MOTOR2 6
-#define LED PIN_PA2 
-#define POT A0
+// Nano Pins
+#ifdef NANO
+  #define MOTOR1 5
+  #define MOTOR2 6
+  #define LED 13 
+  #define POT A0
+  #define SPEEDPIN 7
+#endif
+
+// ATtiny pins
+#ifndef NANO
+  #define MOTOR1 PIN_PA4
+  #define MOTOR2 PIN_PA5
+  #define LED PIN_PA2 
+  #define POT PIN_PA7
+#endif
+
 #define I2CAddress 8
 #define DT 20
-#define SPEEDPIN 7
+
 
 float Kp=7, Ki=0, Kd=0.05;
 uint16_t setpoint = 200;
@@ -52,7 +67,9 @@ void requestEvent(){
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  #ifdef NANO
+    Serial.begin(115200);
+  #endif
   pinMode(POT, INPUT);
   pinMode(MOTOR1, OUTPUT);
   pinMode(MOTOR2, OUTPUT);
@@ -62,8 +79,6 @@ void setup() {
 };
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
 
   // Measure deg from potentiometer
   deg = analogRead(POT)/4;
@@ -71,21 +86,37 @@ void loop() {
 
   // Use PID tp determine output
   output = MyPIDD.NextStep(DT, setpoint, deg);
-  Serial.print("DEG:\t");
-  Serial.print(deg);
-  Serial.print("\tOUTPUT:\t");
-  Serial.println(output);
 
+  #ifdef NANO
+    Serial.print("DEG:\t");
+    Serial.print(deg);
+    Serial.print("\tOUTPUT:\t");
+    Serial.println(output);
+  #endif
 
   if (output < 0){
     analogWrite(MOTOR2, 0);
-    analogWrite(MOTOR1, 255);
-    analogWrite(SPEEDPIN, -output);
+
+    #ifndef NANO
+      analogWrite(MOTOR1, -output);
+    #endif
+
+    #ifdef NANO
+      analogWrite(MOTOR1, 255);
+      analogWrite(SPEEDPIN, -output);
+    #endif
   }
   else{
     analogWrite(MOTOR1, 0);
-    analogWrite(MOTOR2, 255);
-    analogWrite(SPEEDPIN, output);
+
+    #ifndef NANO
+      analogWrite(MOTOR2, -output);
+    #endif
+
+    #ifdef NANO
+      analogWrite(MOTOR2, 255);
+      analogWrite(SPEEDPIN, -output);
+    #endif
   }
 
   delay(DT);
