@@ -1,11 +1,41 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include "MotorControl.h"
 
-void write_motor_pos(int addr, uint16_t pos){
-    Wire.beginTransmission(addr);   // Start sending to motor with addr
-    Wire.write(0x01);               // 0x01 == set position
-    Wire.write(pos & 0x00FF);       // write lower 8 bits
-    pos = pos>>8;                   // Shift down high bits
-    Wire.write(pos);                // write 8 high bits
+MotorControl::MotorControl(uint8_t address)
+{
+    this->addr = address;
+}
+
+
+void MotorControl::pos_raw_write(uint16_t pos){
+    Wire.beginTransmission(this->addr);   // Start sending to motor with addr
+    Wire.write(8);                  // 0x08 == set raw position
+    uint8_t low = pos;
+    uint8_t hi = (pos>>8);
+
+    Wire.write(low);                // write lower 8 bits
+    Wire.write(hi);                 // write 8 high bits
     Wire.endTransmission();         // Send
-}  
+}
+
+uint8_t MotorControl::current_read(){
+    Wire.beginTransmission(this->addr);
+    Wire.write(3);                  // 3 == read current
+    Wire.endTransmission();
+
+    Wire.requestFrom(this->addr, 1u);    //Read 1 byte
+    return(Wire.read());
+}
+
+uint16_t MotorControl::pos_raw_read(){
+    Wire.beginTransmission(this->addr);
+    Wire.write(7);                  // 7 == read raw position
+    Wire.endTransmission();
+
+    Wire.requestFrom(this->addr, 2u);    //Read 2 bytes
+    uint8_t lo = Wire.read();
+    uint8_t hi = Wire.read();
+    return((hi<<8) | lo);
+}
+
