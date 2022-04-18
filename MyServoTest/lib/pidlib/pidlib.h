@@ -1,3 +1,6 @@
+#ifndef PIDLIB_H
+#define PIDLIB_H
+
 class MyPID
 {
 
@@ -7,9 +10,12 @@ class MyPID
         float Kp;
         float Ki;
         float Kd;
+        unsigned long lastTime;
         
 
     public:
         MyPID(float Kp, float Ki, float Kd);
-        float NextStep(float dt, float setpoint, float current_value);
+        float NextStep(float setpoint, float current_value);
 };
+
+#endif

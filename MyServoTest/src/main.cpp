@@ -27,7 +27,7 @@
 #define I2CAddress 8
 #define DT 10
 
-float Kp=5, Ki=0, Kd=0.15;
+float Kp=0.3, Ki=0.1, Kd=.01;
 uint16_t setpoint = 500;
 uint16_t RawPosition;
 int16_t output;
@@ -187,7 +187,7 @@ void loop() {
   current = analogRead(CURRENTPIN);
 
   // Use PID tp determine output
-  output = MyPIDD.NextStep(DT, setpoint, deg);
+  output = MyPIDD.NextStep(setpoint, deg);
 
   #ifdef NANO
     Serial.print("DEG:\t");

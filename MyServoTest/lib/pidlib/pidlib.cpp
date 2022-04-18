@@ -1,19 +1,5 @@
-
-class MyPID
-{
-
-    private:
-        float integral;
-        float previous_error;
-        float Kp;
-        float Ki;
-        float Kd;
-        
-
-    public:
-        MyPID(float Kp, float Ki, float Kd);
-        float NextStep(float dt, float setpoint, float current_value);
-};
+#include "Arduino.h"
+#include "pidlib.h"
 
 MyPID::MyPID(float Kp, float Ki, float Kd)
 {   // constructor (def __init__())
@@ -25,14 +11,24 @@ MyPID::MyPID(float Kp, float Ki, float Kd)
 
 
 }
-float MyPID::NextStep(float dt, float setpoint, float current_value){
 
+float MyPID::NextStep(float setpoint, float current_value){
+
+    // Calculate delta time (seconds) 
+    float dt = (micros() - this->lastTime)/ 1000000.0;
+    this->lastTime = micros();
+
+    // Calculate error
     float current_error = setpoint - current_value;
-    this->integral += (current_error*(dt/1000));
-    float derivative = (current_error - this->previous_error)/(dt/1000);
+    // Calculate integral
+    this->integral += (current_error*(dt));
+    // Calculate derivative
+    float derivative = (current_error - this->previous_error)/(dt);
+    // Calculate output
     float output = this->Kp*current_error + this->Ki*this->integral + this->Kd*derivative;
     this->previous_error = current_error;
     
+    // Constrain output
     if (output > 255){
         output = 255;
     }
