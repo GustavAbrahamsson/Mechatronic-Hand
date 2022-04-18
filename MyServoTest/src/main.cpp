@@ -20,12 +20,14 @@
   #define MOTOR2 PIN_PA5
   #define LED PIN_PA2 
   #define POT PIN_PA7
+  #define POT2 PIN_PA1
+  #define CURRENTPIN PIN_PA6
 #endif
 
 #define I2CAddress 8
 #define DT 10
 
-float Kp=5, Ki=0, Kd=0.2;
+float Kp=5, Ki=0, Kd=0.15;
 uint16_t setpoint = 500;
 uint16_t RawPosition;
 int16_t output;
@@ -166,6 +168,8 @@ void setup() {
   #endif
 
   pinMode(POT, INPUT);
+  pinMode(POT2, INPUT);
+  pinMode(CURRENTPIN, INPUT);
   pinMode(LED, OUTPUT);
   pinMode(MOTOR1, OUTPUT);
   pinMode(MOTOR2, OUTPUT);
@@ -179,6 +183,8 @@ void loop() {
   // Measure deg from potentiometer
   deg = analogRead(POT);
 
+  // Measure current from current sensor
+  current = analogRead(CURRENTPIN);
 
   // Use PID tp determine output
   output = MyPIDD.NextStep(DT, setpoint, deg);
