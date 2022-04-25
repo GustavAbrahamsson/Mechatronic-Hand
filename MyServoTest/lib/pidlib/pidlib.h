@@ -15,7 +15,7 @@ class MyPID
 
     public:
         MyPID(float Kp, float Ki, float Kd);
-        float NextStep(float setpoint, float current_value);
+        float nextStep(float setpoint, float current_value);
 };
 
 #endif

@@ -12,7 +12,7 @@ MyPID::MyPID(float Kp, float Ki, float Kd)
 
 }
 
-float MyPID::NextStep(float setpoint, float current_value){
+float MyPID::nextStep(float setpoint, float current_value){
 
     // Calculate delta time (seconds) 
     float dt = (micros() - this->lastTime)/ 1000000.0;

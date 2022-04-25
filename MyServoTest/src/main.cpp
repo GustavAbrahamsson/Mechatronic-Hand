@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "pidlib.h"
+#include "potlib.h"
 
 // Comment the following line for ATtiny
 //#define NANO
@@ -10,7 +11,7 @@
   #define MOTOR1 5
   #define MOTOR2 6
   #define LED 13 
-  #define POT A0
+  #define POT1 A0
   #define SPEEDPIN 7
 #endif
 
@@ -19,7 +20,7 @@
   #define MOTOR1 PIN_PA4
   #define MOTOR2 PIN_PA5
   #define LED PIN_PA2 
-  #define POT PIN_PA7
+  #define POT1 PIN_PA7
   #define POT2 PIN_PA1
   #define CURRENTPIN PIN_PA6
 #endif
@@ -27,8 +28,8 @@
 #define I2CAddress 8
 #define DT 10
 
-float Kp=0.3, Ki=0.1, Kd=.01;
-uint16_t setpoint = 500;
+float Kp=5, Ki=0, Kd=0;
+uint16_t setpoint = 100;
 uint16_t RawPosition;
 int16_t output;
 
@@ -42,6 +43,7 @@ uint8_t command;
 uint16_t deg;
 
 MyPID MyPIDD(Kp, Ki, Kd);
+POTSwitch MyPOTSwitch(POT1, POT2);
 
 // I2C communication spec.
 
@@ -167,7 +169,7 @@ void setup() {
     TCA0.SPLIT.CTRLA = TCA_SINGLE_CLKSEL_DIV2_gc | TCA_SINGLE_ENABLE_bm;
   #endif
 
-  pinMode(POT, INPUT);
+  pinMode(POT1, INPUT);
   pinMode(POT2, INPUT);
   pinMode(CURRENTPIN, INPUT);
   pinMode(LED, OUTPUT);
@@ -180,14 +182,16 @@ void setup() {
 
 void loop() {
 
-  // Measure deg from potentiometer
-  deg = analogRead(POT);
+  // Decide what potentiometer to send to PID
+  deg = MyPOTSwitch.decidePot();
+
 
   // Measure current from current sensor
   current = analogRead(CURRENTPIN);
+  
 
   // Use PID tp determine output
-  output = MyPIDD.NextStep(setpoint, deg);
+  output = MyPIDD.nextStep(setpoint, deg);
 
   #ifdef NANO
     Serial.print("DEG:\t");
