@@ -8,8 +8,6 @@ MyPID::MyPID(float Kp, float Ki, float Kd)
     this->Kd = Kd;
     this->integral = 0;
     this->previous_error=0;
-
-
 }
 
 float MyPID::nextStep(float setpoint, float current_value){
@@ -22,6 +20,15 @@ float MyPID::nextStep(float setpoint, float current_value){
     float current_error = setpoint - current_value;
     // Calculate integral
     this->integral += (current_error*(dt));
+    // cap integral
+    if(this->integral*this->Ki > 255){
+        this->integral = 255/this->Ki;
+    }
+    if(this->integral*this->Ki < -255){
+        this->integral = -255/this->Ki;
+    }
+
+
     // Calculate derivative
     float derivative = (current_error - this->previous_error)/(dt);
     // Calculate output

@@ -26,21 +26,20 @@
 #endif
 
 #define I2CAddress 8
-#define DT 10
+#define DT 5
 
-float Kp=5, Ki=0, Kd=0;
-uint16_t setpoint = 100;
-uint16_t RawPosition;
+float Kp=3, Ki=0, Kd=0;
+volatile int16_t setpoint = 100;
 int16_t output;
 
-uint16_t minPosition = 0;
-uint16_t maxPosition = 0xFFFF;
+volatile int16_t minPosition = 0;
+volatile int16_t maxPosition = 0xFFFF;
 
-uint8_t current;
-uint8_t maxCurrent = 255;
+volatile uint8_t current;
+volatile uint8_t maxCurrent = 255;
 
-uint8_t command;
-uint16_t deg;
+volatile uint8_t command;
+volatile int16_t deg;
 
 MyPID MyPIDD(Kp, Ki, Kd);
 POTSwitch MyPOTSwitch(POT1, POT2);
@@ -58,6 +57,7 @@ POTSwitch MyPOTSwitch(POT1, POT2);
 // RawPosition  7               2                   R
 // RawSetpoint  8               2                   R/W  
 // AutoLimits*  9               0                   W
+// PID Out     10               2                   R
 
 // *Not yet implemented
 
@@ -96,13 +96,18 @@ void requestEvent(){
     break;
 
   case 7: // Raw position
-    Wire.write((uint8_t) deg & 0xFF);
-    Wire.write((uint8_t) (deg<<8) & 0xFF);
+    Wire.write((uint8_t) deg);
+    Wire.write((uint8_t) (deg>>8));
     break;
 
   case 8: // Raw setpoint
-    Wire.write((uint8_t) setpoint & 0xFF);
-    Wire.write((uint8_t) (setpoint<<8) & 0xFF);
+    Wire.write((uint8_t) setpoint);
+    Wire.write((uint8_t) (setpoint>>8));
+    break;  
+
+  case 10: // PID output
+    Wire.write((uint8_t) output);
+    Wire.write((uint8_t) (output>>8));
     break;  
 
 
@@ -169,8 +174,8 @@ void setup() {
     TCA0.SPLIT.CTRLA = TCA_SINGLE_CLKSEL_DIV2_gc | TCA_SINGLE_ENABLE_bm;
   #endif
 
-  pinMode(POT1, INPUT);
-  pinMode(POT2, INPUT);
+  pinMode(POT1, INPUT_PULLUP);
+  pinMode(POT2, INPUT_PULLUP);
   pinMode(CURRENTPIN, INPUT);
   pinMode(LED, OUTPUT);
   pinMode(MOTOR1, OUTPUT);
@@ -184,6 +189,14 @@ void loop() {
 
   // Decide what potentiometer to send to PID
   deg = MyPOTSwitch.decidePot();
+
+  if(analogRead(POT1) == 1023){
+    // turn on led
+    digitalWrite(LED, HIGH);
+  }else{
+    // turn off led
+    digitalWrite(LED, LOW);
+  }
 
 
   // Measure current from current sensor

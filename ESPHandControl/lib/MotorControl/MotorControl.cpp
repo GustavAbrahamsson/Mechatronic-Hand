@@ -8,7 +8,7 @@ MotorControl::MotorControl(uint8_t address)
 }
 
 
-void MotorControl::pos_raw_write(uint16_t pos){
+void MotorControl::pos_raw_write(int16_t pos){
     Wire.beginTransmission(this->addr);   // Start sending to motor with addr
     Wire.write(8);                  // 0x08 == set raw position
     uint8_t low = pos;
@@ -28,9 +28,20 @@ uint8_t MotorControl::current_read(){
     return(Wire.read());
 }
 
-uint16_t MotorControl::pos_raw_read(){
+int16_t MotorControl::pos_raw_read(){
     Wire.beginTransmission(this->addr);
     Wire.write(7);                  // 7 == read raw position
+    Wire.endTransmission();
+
+    Wire.requestFrom(this->addr, 2u);    //Read 2 bytes
+    uint8_t lo = Wire.read();
+    uint8_t hi = Wire.read();
+    return((hi<<8) | lo);
+}
+
+int16_t MotorControl::PID_output_read(){
+    Wire.beginTransmission(this->addr);
+    Wire.write(10);                  // 10 == read PID output
     Wire.endTransmission();
 
     Wire.requestFrom(this->addr, 2u);    //Read 2 bytes
