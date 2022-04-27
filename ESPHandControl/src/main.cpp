@@ -1,9 +1,11 @@
 #include <Arduino.h>
-#include <WiFi.h>
-#include <esp_now.h>
-#include <ESP32Servo.h>
+//#include <WiFi.h>
+//#include <esp_now.h>
+//#include <ESP32Servo.h>
 #include "MotorControl.h"
+#include "Wire.h"
 
+int i = 0;
 
 enum joint{
   PIP_1,
@@ -16,10 +18,12 @@ enum joint{
   MCP_4
 };
 
-const int maxServos[] = {180, 143, 180, 140, 180, 125, 180, 138};
-//Recommended 2,4,12-19,21-23,25-27,32-33
-const int servoPins[] = {15, 2, 4, 16, 18, 23, 19, 17};
-Servo servos[8];
+MotorControl motor1 = MotorControl(8);
+
+// const int maxServos[] = {180, 143, 180, 140, 180, 125, 180, 138};
+// //Recommended 2,4,12-19,21-23,25-27,32-33
+// const int servoPins[] = {15, 2, 4, 16, 18, 23, 19, 17};
+// Servo servos[8];
 
 
 //uint8_t broadcastAdress[] = {0x94,0xB9,0x7E,0xE4,0x84,0x34}; //MAC-adress till den svarta
@@ -50,55 +54,57 @@ struct_message msg_to_send;
 struct_message recv_data;
 float joint_positions[8];
 
-// Callback when data is sent, triggered when something is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-    Serial.print("\r\nLast Packet Send Status:\t");
-    Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-}
+// // Callback when data is sent, triggered when something is sent
+// void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+//     Serial.print("\r\nLast Packet Send Status:\t");
+//     Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+// }
 
-// Callback when data is received, triggered when something is recieved
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  memcpy(&recv_data, incomingData, sizeof(recv_data));
-  memcpy(&joint_positions, incomingData + 12, sizeof(joint_positions));
-  //Serial.print("Bytes received: ");
-  //Serial.println(len);
-}
+// // Callback when data is received, triggered when something is recieved
+// void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+//   memcpy(&recv_data, incomingData, sizeof(recv_data));
+//   memcpy(&joint_positions, incomingData + 12, sizeof(joint_positions));
+//   //Serial.print("Bytes received: ");
+//   //Serial.println(len);
+// }
 
-void getMACAdress(){
-  WiFi.mode(WIFI_MODE_STA);
-  Serial.println(WiFi.macAddress());
-}
+// void getMACAdress(){
+//   WiFi.mode(WIFI_MODE_STA);
+//   Serial.println(WiFi.macAddress());
+// }
 
-void init_wifi (){
-  WiFi.mode(WIFI_STA);
-  if (esp_now_init() != ESP_OK) {
-    Serial.println("Error initializing ESP-NOW");
-    return;
-  }
+// void init_wifi (){
+//   WiFi.mode(WIFI_STA);
+//   if (esp_now_init() != ESP_OK) {
+//     Serial.println("Error initializing ESP-NOW");
+//     return;
+//   }
  
-  esp_now_register_send_cb(OnDataSent);
+//   esp_now_register_send_cb(OnDataSent);
  
-  esp_now_peer_info_t peerInfo;
-  memcpy(peerInfo.peer_addr, broadcastAdress, 6);
-  peerInfo.channel = 0;  
-  peerInfo.encrypt = false;
+//   esp_now_peer_info_t peerInfo;
+//   memcpy(peerInfo.peer_addr, broadcastAdress, 6);
+//   peerInfo.channel = 0;  
+//   peerInfo.encrypt = false;
  
-  if (esp_now_add_peer(&peerInfo) != ESP_OK){
-    Serial.println("Failed to add peer");
-    return;
-  }
-  // Register for a callback function that will be called when data is received
-  esp_now_register_recv_cb(OnDataRecv);
-}
+//   if (esp_now_add_peer(&peerInfo) != ESP_OK){
+//     Serial.println("Failed to add peer");
+//     return;
+//   }
+//   // Register for a callback function that will be called when data is received
+//   esp_now_register_recv_cb(OnDataRecv);
+// }
 
-void send (){
-  esp_now_send(0, (uint8_t *) &msg_to_send , sizeof(struct_message));
-}
+// void send (){
+//   esp_now_send(0, (uint8_t *) &msg_to_send , sizeof(struct_message));
+// }
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   Wire.begin();
+  
+  motor1.pos_raw_write(700);
 
   //init_wifi();
   //getMACAdress();
@@ -124,11 +130,33 @@ void loop() {
 
   // delay(20);
 
-  Serial.println("Write pos 50");
-  write_motor_pos(8, 50);
-  delay(500);
+  // read motor position
+  Serial.print(motor1.pos_raw_read());
+  
+  // read motor current
+  Serial.print("\t");
+  Serial.print(motor1.PID_output_read());
+  Serial.print("\t");
+  
+  // send motor position
+  if (i < 500) {
+    motor1.pos_raw_write(100);
 
-  Serial.println("Write pos 200");
-  write_motor_pos(8, 200);
-  delay(500);
+    // print motor position
+    Serial.print(100);
+
+  } else if (i < 1000) {
+    motor1.pos_raw_write(900);
+
+    // print motor position
+    Serial.print(900);
+  } else {
+    i = 0;
+  }
+
+  Serial.println();
+  i++;
+
+  delay(10);
+
 }
