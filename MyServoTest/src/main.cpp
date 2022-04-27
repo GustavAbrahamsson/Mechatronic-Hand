@@ -28,8 +28,10 @@
 #define I2CAddress 8
 #define DT 5
 
-float Kp=3, Ki=0, Kd=0;
-volatile int16_t setpoint = 100;
+const float Kp=2, Ki=100, Kd=0.5;
+const float FILTER = 0.2;
+
+volatile int16_t setpoint;
 int16_t output;
 
 volatile int16_t minPosition = 0;
@@ -42,7 +44,7 @@ volatile uint8_t command;
 volatile int16_t deg;
 
 MyPID MyPIDD(Kp, Ki, Kd);
-POTSwitch MyPOTSwitch(POT1, POT2);
+POTSwitch MyPOTSwitch(POT1, POT2, FILTER);
 
 // I2C communication spec.
 
@@ -151,9 +153,6 @@ void recieveEvent(int numbytes){
   case 8: // raw setpoint
     setpoint = buff[0];
     setpoint |= buff[1]<<8;
-    if(buff[0] > 100){
-      digitalWrite(LED, HIGH);
-    }
     break;
  
   default:
@@ -174,15 +173,19 @@ void setup() {
     TCA0.SPLIT.CTRLA = TCA_SINGLE_CLKSEL_DIV2_gc | TCA_SINGLE_ENABLE_bm;
   #endif
 
+  pinMode(LED, OUTPUT);
+  digitalWrite(LED, HIGH);
   pinMode(POT1, INPUT_PULLUP);
   pinMode(POT2, INPUT_PULLUP);
   pinMode(CURRENTPIN, INPUT);
-  pinMode(LED, OUTPUT);
   pinMode(MOTOR1, OUTPUT);
   pinMode(MOTOR2, OUTPUT);
   Wire.begin(I2CAddress);
   Wire.onRequest(requestEvent);
   Wire.onReceive(recieveEvent);
+  delay(100);
+  digitalWrite(LED, LOW);
+  setpoint = analogRead(POT1);
 };
 
 void loop() {
@@ -190,19 +193,9 @@ void loop() {
   // Decide what potentiometer to send to PID
   deg = MyPOTSwitch.decidePot();
 
-  if(analogRead(POT1) == 1023){
-    // turn on led
-    digitalWrite(LED, HIGH);
-  }else{
-    // turn off led
-    digitalWrite(LED, LOW);
-  }
-
-
   // Measure current from current sensor
   current = analogRead(CURRENTPIN);
   
-
   // Use PID tp determine output
   output = MyPIDD.nextStep(setpoint, deg);
 

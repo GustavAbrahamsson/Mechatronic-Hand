@@ -20,6 +20,14 @@ float MyPID::nextStep(float setpoint, float current_value){
     float current_error = setpoint - current_value;
     // Calculate integral
     this->integral += (current_error*(dt));
+    // integral zero-crossing
+    if(
+            (this->previous_error >= 0 && current_error <= 0) ||
+            (this->previous_error <= 0 && current_error >= 0)
+        ){
+        this->integral = 0;
+    }
+    
     // cap integral
     if(this->integral*this->Ki > 255){
         this->integral = 255/this->Ki;
