@@ -33,13 +33,13 @@ MotorControl motors[16] = {
   MotorControl(9, 100, 300, 0, 90), // Thumb rotation
   MotorControl(8, 100, 200, 0, 45), // Thumb abduction
 
-  MotorControl(16, , , ,), //MCP 1
+  MotorControl(16, 250, 500, 0, 90), //MCP 1
   MotorControl(12, 500, 200, 0, 90), // PIP 1
-  MotorControl(, , , , ), // ABD 1
+  MotorControl(19, 450, 550, -15, 15), // ABD 1
 
-  MotorControl(17, , , ), //MCP 2
+  MotorControl(17, 250, 500, 0, 90 ), //MCP 2
   MotorControl(13, 500, 200, 0, 90), // PIP 2
-  MotorControl(, , , , ), // ABD 2
+  MotorControl(18, 450, 550, -15, 15), // ABD 2
 
   MotorControl(20, 750, 500, 0, 90), //MCP 3
   MotorControl(14, 500, 200, 0, 90), // PIP 3
