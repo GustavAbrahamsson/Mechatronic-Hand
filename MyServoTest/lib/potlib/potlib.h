@@ -17,6 +17,7 @@ class POTSwitch
 
     public:
         POTSwitch(int POT1, int POT2, float filter_constant);
+        void reset();
         int16_t decidePot();
 };
 

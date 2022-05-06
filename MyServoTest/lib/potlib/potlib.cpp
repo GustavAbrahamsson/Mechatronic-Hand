@@ -74,3 +74,10 @@ int POTSwitch::filter(int current, int previous){
     float alpha = this->filter_constant;
     return (int) (alpha*current + (1-alpha)*previous);
 }
+
+void POTSwitch::reset(){
+    this->old_deg1 = analogRead(this->pot1);
+    this->old_deg2 = analogRead(this->pot2);
+
+    this->previous = this->old_deg1;
+}

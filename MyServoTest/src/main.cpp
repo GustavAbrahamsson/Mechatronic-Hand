@@ -25,10 +25,10 @@
   #define CURRENTPIN PIN_PA6
 #endif
 
-#define I2CAddress 8
+#define I2CAddress 19
 #define DT 5
 
-const float Kp=2, Ki=100, Kd=0.5;
+const float Kp=2, Ki=10, Kd=0.5;
 const float FILTER = 0.2;
 
 volatile int16_t setpoint;
@@ -185,7 +185,9 @@ void setup() {
   Wire.onReceive(recieveEvent);
   delay(100);
   digitalWrite(LED, LOW);
-  setpoint = analogRead(POT1);
+
+  MyPOTSwitch.reset();
+  setpoint = MyPOTSwitch.decidePot();
 };
 
 void loop() {
@@ -196,8 +198,16 @@ void loop() {
   // Measure current from current sensor
   current = analogRead(CURRENTPIN);
   
-  // Use PID tp determine output
-  output = MyPIDD.nextStep(setpoint, deg);
+  // Use PID to determine output
+  int set = setpoint;
+
+  if (set > 975){
+    set = 975;
+  }else if (set < 50){
+    set = 50;
+  }
+
+  output = MyPIDD.nextStep(set, deg);
 
   #ifdef NANO
     Serial.print("DEG:\t");
