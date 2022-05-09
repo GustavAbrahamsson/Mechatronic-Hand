@@ -4,11 +4,12 @@
 //#include <ESP32Servo.h>
 #include "MotorControl.h"
 #include "Wire.h"
+#include "angles.h"
 
 #define POT_IN 15
 #define BTN 4
 
-int i=9;
+int letter = 0;
 bool pressed = false;
 
 enum joint{
@@ -34,19 +35,19 @@ enum joint{
 MotorControl motors[16] = {
   MotorControl(11, 280, 50, 0, 90), // Thumb IP
   MotorControl(10, 440, 125, 0, 90), // Thumb MCP
-  MotorControl(9, 445, 100, 0, 90), // Thumb rotation
+  MotorControl(9, 445, 120, 0, 90), // Thumb rotation
   MotorControl(8, 448, 240, 0, 45), // Thumb abduction
 
-  MotorControl(16, 240, 530, 0, 90), //MCP 1
+  MotorControl(16, 260, 530, 0, 90), //MCP 1
   MotorControl(12, 130, 390, 0, 90), // PIP 1
   MotorControl(18, 540, 615, -15, 15), // ABD 1
 
-  MotorControl(17, 240, 560, 0, 90 ), //MCP 2
-  MotorControl(13, 206, 580, 0, 90), // PIP 2
+  MotorControl(17, 240, 540, 0, 90 ), //MCP 2
+  MotorControl(13, 330, 580, 0, 90), // PIP 2
   MotorControl(19, 555, 600, -15, 15), // ABD 2
 
-  MotorControl(20, 710, 370, 0, 90), //MCP 3
-  MotorControl(14, 245, 500, 0, 90), // PIP 3
+  MotorControl(20, 710, 400, 0, 90), //MCP 3
+  MotorControl(14, 275, 500, 0, 90), // PIP 3
   MotorControl(22, 500, 460, -15, 15), // ABD 3
 
   MotorControl(21, 710, 450, 0, 90), //MCP 4
@@ -133,6 +134,13 @@ uint8_t broadcastAdress[] = {0x94,0xB9,0x7E,0xE5,0x31,0xD8}; //MAC till Hand lol
 //   esp_now_send(0, (uint8_t *) &msg_to_send , sizeof(struct_message));
 // }
 
+void setAllZero(){
+
+  for(int i = 0; i < 16; i++){
+    motors[i].angle_write(0);
+  }
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -140,6 +148,8 @@ void setup() {
 
   pinMode(POT_IN, INPUT);
   pinMode(BTN, INPUT_PULLDOWN);
+
+  setAllZero();
 
   //init_wifi();
   //getMACAdress();
@@ -152,57 +162,78 @@ void setup() {
   // }
 }
 
+// 330 = 0, 580 = 90
 void loop() {
+  
+  Serial.println("next");
+  while (!Serial.available()){}
 
-  while (digitalRead(BTN) == LOW)
-  {
-    delay(20);
+  char l = Serial.read() - 'a';
+  
+  if (l < 0 || l > 27){
+    return;
   }
 
-  // send all motors to 0
+
+  // Write letter
   for (int i = 0; i < 16; i++)
   {
-    motors[i].angle_write(0);
-
-    Serial.print(" Motor: ");
-    Serial.print(motors[i].addr);
-    Serial.println(" Angle: 0");
-
-    delay(1000);
+    motors[i].angle_write(letters[l][i]);
   }
+  
+  delay(500);
+  
 
-  while (digitalRead(BTN) == LOW)
-  {
-    delay(20);
-  }
 
-  // Test all motors
-  for (int i = 0; i < 16; i++){
-    MotorControl motor = motors[i];
+  // while (digitalRead(BTN) == LOW)
+  // {
+  //   delay(20);
+  // }
 
-    motor.angle_write(motor.minAngle);
-    Serial.print(" Motor: ");
-    Serial.print(motors[i].addr);
-    Serial.print(" Angle: ");
-    Serial.println(motor.minAngle);
+  // // send all motors to 0
+  // for (int i = 0; i < 16; i++)
+  // {
+  //   motors[i].angle_write(0);
 
-    delay(1000);
+  //   Serial.print(" Motor: ");
+  //   Serial.print(motors[i].addr);
+  //   Serial.println(" Angle: 0");
 
-    motor.angle_write(motor.maxAngle);
-    Serial.print(" Motor: ");
-    Serial.print(motors[i].addr);
-    Serial.print(" Angle:");
-    Serial.println(motor.maxAngle);
+  //   delay(1000);
+  // }
 
-    delay(1000);
+  // while (digitalRead(BTN) == LOW)
+  // {
+  //   delay(20);
+  // }
+
+  // // Test all motors
+  // for (int i = 0; i < 16; i++){
+  //   MotorControl motor = motors[i];
+
+  //   motor.angle_write(motor.minAngle);
+  //   Serial.print(" Motor: ");
+  //   Serial.print(motors[i].addr);
+  //   Serial.print(" Angle: ");
+  //   Serial.println(motor.minAngle);
+
+  //   delay(1000);
+
+  //   motor.angle_write(motor.maxAngle);
+  //   Serial.print(" Motor: ");
+  //   Serial.print(motors[i].addr);
+  //   Serial.print(" Angle:");
+  //   Serial.println(motor.maxAngle);
+
+  //   delay(1000);
     
-    motor.angle_write(motor.minAngle);
-    Serial.print(" Motor: ");
-    Serial.print(motors[i].addr);
-    Serial.print(" Angle: ");
-    Serial.println(motor.minAngle);
+  //   motor.angle_write(motor.minAngle);
+  //   Serial.print(" Motor: ");
+  //   Serial.print(motors[i].addr);
+  //   Serial.print(" Angle: ");
+  //   Serial.println(motor.minAngle);
 
-    delay(1000);
-  }
+  //   delay(1000);
+  // }
 
 }
