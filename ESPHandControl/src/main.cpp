@@ -32,18 +32,18 @@ enum joint{
 
 //List of 16 motor objects
 MotorControl motors[16] = {
-  MotorControl(11, 300, 50, 0, 90), // Thumb IP
+  MotorControl(11, 280, 50, 0, 90), // Thumb IP
   MotorControl(10, 440, 125, 0, 90), // Thumb MCP
   MotorControl(9, 445, 100, 0, 90), // Thumb rotation
   MotorControl(8, 448, 240, 0, 45), // Thumb abduction
 
   MotorControl(16, 240, 530, 0, 90), //MCP 1
   MotorControl(12, 130, 390, 0, 90), // PIP 1
-  MotorControl(19, 555, 600, -15, 15), // ABD 1
+  MotorControl(18, 540, 615, -15, 15), // ABD 1
 
   MotorControl(17, 240, 560, 0, 90 ), //MCP 2
   MotorControl(13, 206, 580, 0, 90), // PIP 2
-  MotorControl(18, 540, 615, -15, 15), // ABD 2
+  MotorControl(19, 555, 600, -15, 15), // ABD 2
 
   MotorControl(20, 710, 370, 0, 90), //MCP 3
   MotorControl(14, 245, 500, 0, 90), // PIP 3
@@ -154,48 +154,55 @@ void setup() {
 
 void loop() {
 
+  while (digitalRead(BTN) == LOW)
+  {
+    delay(20);
+  }
+
+  // send all motors to 0
+  for (int i = 0; i < 16; i++)
+  {
+    motors[i].angle_write(0);
+
+    Serial.print(" Motor: ");
+    Serial.print(motors[i].addr);
+    Serial.println(" Angle: 0");
+
+    delay(1000);
+  }
+
+  while (digitalRead(BTN) == LOW)
+  {
+    delay(20);
+  }
+
   // Test all motors
   for (int i = 0; i < 16; i++){
     MotorControl motor = motors[i];
 
     motor.angle_write(motor.minAngle);
+    Serial.print(" Motor: ");
+    Serial.print(motors[i].addr);
+    Serial.print(" Angle: ");
+    Serial.println(motor.minAngle);
+
     delay(1000);
+
     motor.angle_write(motor.maxAngle);
+    Serial.print(" Motor: ");
+    Serial.print(motors[i].addr);
+    Serial.print(" Angle:");
+    Serial.println(motor.maxAngle);
+
+    delay(1000);
+    
+    motor.angle_write(motor.minAngle);
+    Serial.print(" Motor: ");
+    Serial.print(motors[i].addr);
+    Serial.print(" Angle: ");
+    Serial.println(motor.minAngle);
+
     delay(1000);
   }
-
-
-  // // read potentiometer
-  // int pot_value = analogRead(POT_IN);
-
-  // // set potentiometer value to motor i
-  // motors[i].pos_raw_write(pot_value);
-
-  // Serial.print(motors[i].addr);
-  // Serial.print("\t");
-
-  // // read motor position
-  // Serial.print(motors[i].pos_raw_read());
-  // Serial.print("\t");
-
-  // // read motor current
-  // Serial.print(motors[i].current_read());
-  // Serial.print("\t");
-
-  // Serial.println();
-
-  // if(digitalRead(BTN) == HIGH && !pressed){
-  //   i++;
-  //   i = i%16;
-  //   pressed = true;
-  //   delay(100);
-  // }
-
-  // if(pressed && digitalRead(BTN) == LOW){
-  //   pressed = false;
-  //   delay(100);
-  // }
-
-  // delay(20);
 
 }

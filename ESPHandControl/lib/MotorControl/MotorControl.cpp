@@ -22,14 +22,15 @@ void MotorControl::pos_raw_write(int16_t pos){
 }
 
 void MotorControl::angle_write(int16_t pos){
-    int16_t pos_raw = map(pos, this->minAngle, this->maxAngle, this->minPosition, this->maxPosition);
 
     // limit to max and min
-    if (pos_raw < this->minPosition){
-        pos_raw = this->minPosition;
-    }else if(pos_raw > this->maxPosition){
-        pos_raw = this->maxPosition;
+    if (pos < this->minAngle){
+        pos = this->minAngle;
+    }else if(pos > this->maxAngle){
+        pos = this->maxAngle;
     }
+
+    int16_t pos_raw = map(pos, this->minAngle, this->maxAngle, this->minPosition, this->maxPosition);
 
     this->pos_raw_write(pos_raw);
 }
