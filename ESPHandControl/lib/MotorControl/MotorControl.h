@@ -8,10 +8,10 @@ private:
 
     int16_t minPosition;
     int16_t maxPosition;
-    int16_t minAngle;
-    int16_t maxAngle;
 
 public:
+    int16_t minAngle;
+    int16_t maxAngle;
     uint8_t addr;
     MotorControl(uint8_t address, int16_t minPosition, int16_t maxPosition, int16_t minAngle, int16_t maxAngle);
     void pos_raw_write(int16_t pos);

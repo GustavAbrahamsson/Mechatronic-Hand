@@ -25,7 +25,7 @@
   #define CURRENTPIN PIN_PA6
 #endif
 
-#define I2CAddress 19
+#define I2CAddress 23
 #define DT 5
 
 const float Kp=2, Ki=10, Kd=0.5;
