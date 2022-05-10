@@ -56,6 +56,48 @@ int y[16] = {0,  0,  0,  0, 0,  0,  0, 0,  0, 0,   0,  0,  0,  0,  0,  0};
 int z[16] = {10, 20, 60,  0, 0, 0,  0, 55, 40, 0,  55, 40,  0, 65, 50,  0};
 int fu[16] = {0,   0,  20, 20, 90, 90,  0, 15, 0, 0,  90, 90,  0, 90, 90,  0};
 
+// Grips
+// Large diameter	20	20	48	0	28	30	0	28	30	0	28	30	0	28	30	0
+// Medium diameter	10	20	43	0	45	40	0	45	40	0	45	40	0	45	40	0
+// medium wrap  	10	20	20	0	45	40	0	45	40	0	45	40	0	45	40	0
+// Abducted thumb	0	0	10	10	70	70	0	70	70	0	70	70	0	70	70	0
+// Light tool   	0	0	10	30	0	90	0	0	90	0	0	90	0	0	90	0
+// thumb 4 finger	10	20	43	0	45	40	0	45	40	0	45	40	0	45	40	0
+// thumb 3 finger	10	20	43	0	45	40	0	45	40	0	45	40	0	10	10	0
+// thumb 2 finger	10	20	43	0	45	40	0	45	40	0	10	10	0	10	10	0
+// thumb index		10	20	43	0	45	40	0	10	10	0	10	10	0	10	10	0
+// power disc		10	30	10	0	30	30	10	30	30	0	30	30	10	30	30	15
+// power sphere 	10	0	60	0	30	20	10	30	20	0	30	20	15	30	30	30
+// Precision disc	20	20	90	0	30	20	10	10	20	0	10	20	15	40	20	30
+// Precision sphere	20	20	90	0	30	20	10	10	20	0	10	20	15	40	20	30
+// Tripod	    	10	20	43	0	45	40	0	45	40	0	10	10	0	10	10	0
+// platform push	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+// Lateral pinch	0	0	80	38	40	90	0	50	90	0	60	90	0	70	90	0
+
+// ThumbDIP	ThumbMCP	ThumbCMC	ThumbAbb	IndexMCP	IndexPIP_6	IndexAbb	MiddleMCP	MiddlePIP	MiddleAbb	RingMCP	RingPIP	RingAbb	PinkyMCP	PinkyPIP	PinkyAbb
+int large_diameter[16] = {20, 20, 50, 10, 10, 50, 0, 38, 50, 0, 48, 60, 0, 58, 70, 0};     //A
+int medium_diameter[16] = {0,  0, 60,  0, 80, 90,  0, 90, 80, 0,  80, 90,  0, 80, 90,  0};//B
+int medium_wrap[16] = {0,  0, 40,  20, 90, 90,  0, 90, 80, 0,  80, 90,  0, 80, 90,  0};//C
+int abducted_thumb[16] = {0,  0, 25,  10, 90, 90,  0, 90, 80, 0,  80, 90,  0, 80, 90,  0};//D
+int light_tool[16] = {0,  0, 25,  30, 90, 90,  0, 90, 90, 0,  90, 90,  0, 90, 90,  0};//E
+int thumb_4_finger[16] = {10, 20, 60, 0, 55, 50, 30, 45, 40, 0, 45, 50, 0, 55, 40, 0};//F
+int thumb_3_finger[16] = {10, 20, 60, 0, 55, 50, 30, 45, 40, 0, 45, 50, 0, 90, 90, 0};//G
+int thumb_2_finger[16] = {10, 20, 60, 0, 55, 50, 30, 45, 40, 0, 90, 90, 0, 90, 90, 0};//H
+int thumb_index[16] = {10, 20, 56, 0, 55, 50, 0, 90, 90, 0, 90, 90, 0, 90, 90, 0};//I
+int power_disc[16] = {40, 90, 30, 0, 70, 90, 20, 60, 70, 0, 60, 90, 10, 80, 70, 15};//J
+int power_sphere[16] = {20, 30, 40, 0, 55, 50, 30, 50, 55, 30, 60, 60, 30, 80, 60, 30};//K
+
+int precision_disc[16] = {0, 30, 60, 0, 20, 45, 0, 10, 45, 0, 20, 45, 0, 40, 50, 30};//L
+
+int precision_sphere[16] = {20, 20, 90, 0, 30, 20, 10, 10, 20, 0, 10, 20, 15, 40, 20, 30};//M
+int tripod[16] = {10, 20, 43, 0, 45, 40, 0, 45, 40, 0, 10, 10, 0, 10, 10, 0};//N
+int platform_push[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};//O
+int lateral_pinch[16] = {0, 0, 80, 38, 40, 90, 0, 50, 90, 0, 60, 90, 0, 70, 90, 0};//P
+
+
 
 //array containg all letters
 int * letters[] = {a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, fu};
+
+//array containing all grips
+int * grips[] = {large_diameter, medium_diameter, medium_wrap, abducted_thumb, light_tool, thumb_4_finger, thumb_3_finger, thumb_2_finger, thumb_index, power_disc, power_sphere, precision_disc, precision_sphere, tripod, platform_push, lateral_pinch};

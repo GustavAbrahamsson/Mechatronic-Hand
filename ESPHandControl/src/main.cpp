@@ -171,6 +171,7 @@ void loop() {
   char l = Serial.read() - 'a';
   
   if (l < 0 || l > 27){
+    Serial.println("invalid");
     return;
   }
 
@@ -178,7 +179,7 @@ void loop() {
   // Write letter
   for (int i = 0; i < 16; i++)
   {
-    motors[i].angle_write(letters[l][i]);
+    motors[i].angle_write(grips[l][i]);
   }
   
   delay(500);
