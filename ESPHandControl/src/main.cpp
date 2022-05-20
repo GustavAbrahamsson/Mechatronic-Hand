@@ -4,12 +4,28 @@
 #include "MotorControl.h"
 #include "Wire.h"
 #include "angles.h"
+#include "Math.h"
 
 #define POT_IN 15
 #define BTN 4
 
 int letter = 0;
 bool pressed = false;
+
+uint32_t currentTime = 0;
+uint32_t lastTime = 0;
+
+uint32_t phaseShift = 3000;
+float waveTime = 500.0;
+
+uint8_t indexAngle  = 0;
+uint8_t middleAngle = 0;
+uint8_t ringAngle   = 0;
+uint8_t littleAngle = 0;
+
+uint8_t sequenceIndex = 0;
+
+uint8_t CMCangle = 0;
 
 int mode = 1;
 
@@ -45,11 +61,11 @@ MotorControl motors[16] = {
 
   MotorControl(17, 240, 540, 0, 90 ), //MCP 2
   MotorControl(13, 330, 580, 0, 90), // PIP 2
-  MotorControl(19, 555, 600, -15, 15), // ABD 2
+  MotorControl(19, 530, 620, -15, 15), // ABD 2
 
   MotorControl(20, 710, 400, 0, 90), //MCP 3
   MotorControl(14, 275, 500, 0, 90), // PIP 3
-  MotorControl(22, 500, 460, -15, 15), // ABD 3
+  MotorControl(22, 520, 440, -15, 15), // ABD 3
 
   MotorControl(21, 710, 450, 0, 90), //MCP 4
   MotorControl(15, 270, 490, 0, 90), // PIP 4
@@ -137,6 +153,7 @@ void setAllZero(){
   }
 }
 
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -152,37 +169,40 @@ void setup() {
 }
 
 void loop() {
-  
-  Serial.println("next");
-  while (!Serial.available()){}
 
-  char l = Serial.read();
+  currentTime = millis();
+  char l = '0';  
+  if(Serial.available()){
+    l = Serial.read();
+  }
 
   if (l == '1'){
     mode = 1;
     Serial.println("Mode 1: letters");
+    delay(500);
   }else if (l == '2'){
     mode = 2;
     Serial.println("Mode 2: grasps");
+    delay(500);
   }else if (l == '3'){
     mode = 3;
     Serial.println("Mode 3: demo");
+    delay(500);
   }else if (mode == 1){
     // mode 1 = letters
 
     l = l-'a';
 
     if (l < 0 || l > 27){
-      Serial.println("invalid");
       return;
     }
-
 
     // Write letter
     for (int i = 0; i < 16; i++)
     {
-      motors[i].angle_write(grips[l][i]);
+      motors[i].angle_write(letters[l][i]);
     }
+  delay(500);
 
   }else if(mode == 2){
     // mode 2 = grasps
@@ -190,23 +210,102 @@ void loop() {
     l = l-'a';
 
     if (l < 0 || l > 16){
-      Serial.println("invalid");
       return;
     }
 
     // Write grasp
     for (int i = 0; i < 16; i++)
     {
-      motors[i].angle_write(grasps[l][i]);
+      motors[i].angle_write(grips[l][i]);
     }
+  delay(500);
   }else if(mode == 3){
     // mode 3 = demo
+    currentTime = currentTime % 45000;
+
+    if(currentTime < 10000){
+      indexAngle = 45 + 45*sin(currentTime/waveTime);
+      motors[MCP_1].angle_write(indexAngle);
+      motors[PIP_1].angle_write(indexAngle);
+
+      middleAngle = 45 + 45*sin((currentTime + 2 * phaseShift)/waveTime);
+      motors[MCP_2].angle_write(middleAngle);
+      motors[PIP_2].angle_write(middleAngle);
+      
+      ringAngle = 45 + 45*sin((currentTime + 3 * phaseShift)/waveTime);
+      motors[MCP_3].angle_write(ringAngle);
+      motors[PIP_3].angle_write(ringAngle);
+      
+      littleAngle = 45 + 45*sin((currentTime + 4 * phaseShift)/waveTime);
+      motors[MCP_4].angle_write(littleAngle);
+      motors[PIP_4].angle_write(littleAngle);
+
+      CMCangle = 10 + 10*sin((currentTime-waveTime)/waveTime);
+      motors[CMC_TMB].angle_write(CMCangle);
+      motors[IP_TMB].angle_write(2*CMCangle);
+      motors[MCP_TMB].angle_write(2*CMCangle);
+
     
+    }else if(currentTime < 11000){
+      setAllZero();
 
+    }else if(currentTime < 20000){
+      motors[MCP_1].angle_write(0);
+      motors[PIP_1].angle_write(0);
+      motors[MCP_2].angle_write(0);
+      motors[PIP_2].angle_write(0);
+      motors[MCP_3].angle_write(0);
+      motors[PIP_3].angle_write(0);
+      motors[MCP_4].angle_write(0);
+      motors[PIP_4].angle_write(0);
+      motors[MCP_TMB].angle_write(0);
+      motors[IP_TMB].angle_write(0);
+      motors[CMC_TMB].angle_write(0);
+      motors[ABD_TMB].angle_write(0);
+
+
+      if(currentTime % 4000 < 1000){
+        motors[ABD_1].angle_write(-15);
+        motors[ABD_2].angle_write(-15);
+        motors[ABD_3].angle_write(-15);
+        motors[ABD_4].angle_write(-15);
+      }else if(currentTime % 4000 < 2000){
+        motors[ABD_1].angle_write(15);
+        motors[ABD_2].angle_write(-15);
+        motors[ABD_3].angle_write(-15);
+        motors[ABD_4].angle_write(15);
+      }else if(currentTime % 4000 < 3000){
+        motors[ABD_1].angle_write(-15);
+        motors[ABD_2].angle_write(-15);
+        motors[ABD_3].angle_write(-15);
+        motors[ABD_4].angle_write(-15);
+      }else{
+        motors[ABD_1].angle_write(10);
+        motors[ABD_2].angle_write(15);
+        motors[ABD_3].angle_write(15);
+        motors[ABD_4].angle_write(0);
+      }
+    }else if(currentTime < 21000){
+      setAllZero();
+    }else if(currentTime < 35000){
+      motors[ABD_1].angle_write(10);
+      motors[ABD_4].angle_write(10);
+      if(currentTime - lastTime > 750){
+        lastTime = currentTime;
+        sequenceIndex++;
+        sequenceIndex %= 15;
+        motors[sequenceIndex].angle_write(0);
+        if(!((sequenceIndex + 1) % 3 == 0) || sequenceIndex == 2 ){
+          motors[sequenceIndex + 1].angle_write(motors[sequenceIndex + 1].maxAngle);
+        }
+      }
+    }else if(currentTime < 36000){
+      setAllZero();
+    }else{
+      for(int i = 0; i < 16; i++){
+        motors[i].angle_write(yeah[i]);
+      }
+    }
+    delay(50);
   }
-  
-  
-  delay(500);
-}
-
 }
