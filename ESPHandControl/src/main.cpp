@@ -1,7 +1,6 @@
 #include <Arduino.h>
 //#include <WiFi.h>
 //#include <esp_now.h>
-//#include <ESP32Servo.h>
 #include "MotorControl.h"
 #include "Wire.h"
 #include "angles.h"
@@ -11,6 +10,8 @@
 
 int letter = 0;
 bool pressed = false;
+
+int mode = 1;
 
 enum joint{
   IP_TMB,
@@ -54,11 +55,6 @@ MotorControl motors[16] = {
   MotorControl(15, 270, 490, 0, 90), // PIP 4
   MotorControl(23, 670, 570, -15, 15), // ABD 4
 };
-
-// const int maxServos[] = {180, 143, 180, 140, 180, 125, 180, 138};
-// //Recommended 2,4,12-19,21-23,25-27,32-33
-// const int servoPins[] = {15, 2, 4, 16, 18, 23, 19, 17};
-// Servo servos[8];
 
 
 //uint8_t broadcastAdress[] = {0x94,0xB9,0x7E,0xE4,0x84,0x34}; //MAC-adress till den svarta
@@ -153,88 +149,64 @@ void setup() {
 
   //init_wifi();
   //getMACAdress();
-
-  // // init all servos
-  // for (int i = 0; i < 8; i++)
-  // {
-  //   servos[i].setPeriodHertz(50); //50 Hz servo
-  //   servos[i].attach(servoPins[i], 500, 2500); //Attach correct pin and set limits
-  // }
 }
 
-// 330 = 0, 580 = 90
 void loop() {
   
   Serial.println("next");
   while (!Serial.available()){}
 
-  char l = Serial.read() - 'a';
+  char l = Serial.read();
+
+  if (l == '1'){
+    mode = 1;
+    Serial.println("Mode 1: letters");
+  }else if (l == '2'){
+    mode = 2;
+    Serial.println("Mode 2: grasps");
+  }else if (l == '3'){
+    mode = 3;
+    Serial.println("Mode 3: demo");
+  }else if (mode == 1){
+    // mode 1 = letters
+
+    l = l-'a';
+
+    if (l < 0 || l > 27){
+      Serial.println("invalid");
+      return;
+    }
+
+
+    // Write letter
+    for (int i = 0; i < 16; i++)
+    {
+      motors[i].angle_write(grips[l][i]);
+    }
+
+  }else if(mode == 2){
+    // mode 2 = grasps
+
+    l = l-'a';
+
+    if (l < 0 || l > 16){
+      Serial.println("invalid");
+      return;
+    }
+
+    // Write grasp
+    for (int i = 0; i < 16; i++)
+    {
+      motors[i].angle_write(grasps[l][i]);
+    }
+  }else if(mode == 3){
+    // mode 3 = demo
+    
+
+  }
   
-  if (l < 0 || l > 27){
-    Serial.println("invalid");
-    return;
-  }
-
-
-  // Write letter
-  for (int i = 0; i < 16; i++)
-  {
-    motors[i].angle_write(grips[l][i]);
-  }
   
   delay(500);
-  
-
-
-  // while (digitalRead(BTN) == LOW)
-  // {
-  //   delay(20);
-  // }
-
-  // // send all motors to 0
-  // for (int i = 0; i < 16; i++)
-  // {
-  //   motors[i].angle_write(0);
-
-  //   Serial.print(" Motor: ");
-  //   Serial.print(motors[i].addr);
-  //   Serial.println(" Angle: 0");
-
-  //   delay(1000);
-  // }
-
-  // while (digitalRead(BTN) == LOW)
-  // {
-  //   delay(20);
-  // }
-
-  // // Test all motors
-  // for (int i = 0; i < 16; i++){
-  //   MotorControl motor = motors[i];
-
-  //   motor.angle_write(motor.minAngle);
-  //   Serial.print(" Motor: ");
-  //   Serial.print(motors[i].addr);
-  //   Serial.print(" Angle: ");
-  //   Serial.println(motor.minAngle);
-
-  //   delay(1000);
-
-  //   motor.angle_write(motor.maxAngle);
-  //   Serial.print(" Motor: ");
-  //   Serial.print(motors[i].addr);
-  //   Serial.print(" Angle:");
-  //   Serial.println(motor.maxAngle);
-
-  //   delay(1000);
-    
-  //   motor.angle_write(motor.minAngle);
-  //   Serial.print(" Motor: ");
-  //   Serial.print(motors[i].addr);
-  //   Serial.print(" Angle: ");
-  //   Serial.println(motor.minAngle);
-
-  //   delay(1000);
-  // }
+}
 
 }
