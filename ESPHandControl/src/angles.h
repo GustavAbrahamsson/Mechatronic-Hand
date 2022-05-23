@@ -96,7 +96,7 @@ int lateral_pinch[16] = {0, 0, 80, 38, 40, 90, 0, 50, 90, 0, 60, 90, 0, 70, 90, 
 
 
 //array containg all letters
-int * letters[] = {a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, fu};
+int * letters[] = {a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, fu, yeah};
 
 //array containing all grips
 int * grips[] = {large_diameter, medium_diameter, medium_wrap, abducted_thumb, light_tool, thumb_4_finger, thumb_3_finger, thumb_2_finger, thumb_index, power_disc, power_sphere, precision_disc, precision_sphere, tripod, platform_push, lateral_pinch};

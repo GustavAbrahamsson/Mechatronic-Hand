@@ -193,7 +193,7 @@ void loop() {
 
     l = l-'a';
 
-    if (l < 0 || l > 27){
+    if (l < 0 || l > 28){
       return;
     }
 
