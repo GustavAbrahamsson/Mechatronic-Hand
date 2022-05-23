@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include <WiFi.h>
-#include <esp_now.h>
+//#include <WiFi.h>
+//#include <esp_now.h>
 #include "MotorControl.h"
 #include "Wire.h"
 #include "angles.h"
@@ -72,107 +72,79 @@ MotorControl motors[16] = {
   MotorControl(23, 670, 570, -15, 15), // ABD 4
 };
 
+
 //uint8_t broadcastAdress[] = {0x94,0xB9,0x7E,0xE4,0x84,0x34}; //MAC-adress till den svarta
 //uint8_t broadcastAdress[] = {0x7C,0x9E,0xBD,0x60,0xD1,0x8C}; //MAC till den med kondensatorn
-uint8_t broadcastAdress[] = {0X7C,0X9E,0XBD,0X61,0X58,0XF4}; //MAC till den med vit tejp
-//uint8_t broadcastAdress[] = {0X7C,0X9E,0XBD,0X61,0X58,0XF4}; //MAC till Hand lolin
+//uint8_t broadcastAdress[] = {0X7C,0X9E,0XBD,0X61,0X58,0XF4}; //MAC till den med vit tejp
+uint8_t broadcastAdress[] = {0x94,0xB9,0x7E,0xE5,0x31,0xD8}; //MAC till Hand lolin
 
-typedef struct struct_message{
-  int sendID;
-  float thumbIP;
-  float thumbMCP;
-  float finger1PIP;
-  float finger1MCP;
-  float finger2PIP;
-  float finger2MCP;
-  float finger3PIP;
-  float finger3MCP;
-  float finger4PIP;
-  float finger4MCP;
-  float thumbOpp;
-  float finger1Pot;
-  float finger2Po;
-  float finger3Po;
-  float finger4Po;
-  float opposition;
-  float pot1;
-  float pot2;
-  float pot3;
-  float pot4;
- }struct_message;
+// typedef struct struct_message{
+//   int sendID;
+//   float thumbIP;
+//   float thumbMCP;
+//   float finger1PIP;
+//   float finger1MCP;
+//   float finger2PIP;
+//   float finger2MCP;
+//   float finger3PIP;
+//   float finger3MCP;
+//   float finger4PIP;
+//   float finger4MCP;
+//   float thumbOpp;
+//   float test12;
+//   float test13;
+//   float test14;
+//   float test15;
+// }struct_message;
 
-struct_message msg_to_send;
-struct_message recv_data;
-float joint_positions[8];
+// struct_message msg_to_send;
+// struct_message recv_data;
+// float joint_positions[8];
 
 // // Callback when data is sent, triggered when something is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-     Serial.print("\r\nLast Packet Send Status:\t");
-     Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
- }
+// void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+//     Serial.print("\r\nLast Packet Send Status:\t");
+//     Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+// }
 
 // // Callback when data is received, triggered when something is recieved
- void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-   memcpy(&recv_data, incomingData, sizeof(recv_data));
-   memcpy(&joint_positions, incomingData + 12, sizeof(joint_positions));
+// void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+//   memcpy(&recv_data, incomingData, sizeof(recv_data));
+//   memcpy(&joint_positions, incomingData + 12, sizeof(joint_positions));
+//   //Serial.print("Bytes received: ");
+//   //Serial.println(len);
+// }
 
-   //Serial.print("Bytes received: ");
-   //Serial.println(len);
+// void getMACAdress(){
+//   WiFi.mode(WIFI_MODE_STA);
+//   Serial.println(WiFi.macAddress());
+// }
 
-   motors[IP_TMB].angle_write(recv_data.thumbIP);
-   motors[MCP_TMB].angle_write(recv_data.thumbMCP);
-   motors[CMC_TMB].angle_write(recv_data.opposition);
-   motors[PIP_1].angle_write(recv_data.finger1PIP);
-   motors[MCP_1].angle_write(recv_data.finger1MCP);
-   motors[PIP_2].angle_write(recv_data.finger2PIP);
-   motors[MCP_2].angle_write(recv_data.finger2MCP);
-   motors[PIP_3].angle_write(recv_data.finger3PIP);
-   motors[MCP_3].angle_write(recv_data.finger3MCP);
-   motors[PIP_4].angle_write(recv_data.finger4PIP);
-   motors[MCP_4].angle_write(recv_data.finger4MCP);
-  /*
-   motors[ABD_1].angle_write(recv_data.finger1Pot);
-   motors[ABD_2].angle_write(recv_data.finger2Po);
-   motors[ABD_3].angle_write(recv_data.finger3Po);
-   motors[ABD_4].angle_write(recv_data.finger4Po);
-   */
-   motors[ABD_1].angle_write(0);
-   motors[ABD_2].angle_write(0);
-   motors[ABD_3].angle_write(0);
-   motors[ABD_4].angle_write(0);
- }
-
- void getMACAdress(){
-   WiFi.mode(WIFI_MODE_STA);
-   Serial.println(WiFi.macAddress());
- }
-
- void init_wifi (){
-   WiFi.mode(WIFI_STA);
-   if (esp_now_init() != ESP_OK) {
-     Serial.println("Error initializing ESP-NOW");
-     return;
-   }
+// void init_wifi (){
+//   WiFi.mode(WIFI_STA);
+//   if (esp_now_init() != ESP_OK) {
+//     Serial.println("Error initializing ESP-NOW");
+//     return;
+//   }
  
-   esp_now_register_send_cb(OnDataSent);
+//   esp_now_register_send_cb(OnDataSent);
  
-   esp_now_peer_info_t peerInfo;
-   memcpy(peerInfo.peer_addr, broadcastAdress, 6);
-   peerInfo.channel = 0;  
-   peerInfo.encrypt = false;
+//   esp_now_peer_info_t peerInfo;
+//   memcpy(peerInfo.peer_addr, broadcastAdress, 6);
+//   peerInfo.channel = 0;  
+//   peerInfo.encrypt = false;
  
-   if (esp_now_add_peer(&peerInfo) != ESP_OK){
-     Serial.println("Failed to add peer");
-     return;
-   }
-   // Register for a callback function that will be called when data is received
-   esp_now_register_recv_cb(OnDataRecv);
- }
+//   if (esp_now_add_peer(&peerInfo) != ESP_OK){
+//     Serial.println("Failed to add peer");
+//     return;
+//   }
+//   // Register for a callback function that will be called when data is received
+//   esp_now_register_recv_cb(OnDataRecv);
+// }
 
- void send (){
-   msg_to_send.sendID = 1;
-   esp_now_send(0, (uint8_t *) &msg_to_send , sizeof(struct_message));
- }
+// void send (){
+//   esp_now_send(0, (uint8_t *) &msg_to_send , sizeof(struct_message));
+// }
 
 void setAllZero(){
 
@@ -181,26 +153,22 @@ void setAllZero(){
   }
 }
 
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   Wire.begin();
-
-  init_wifi();
-  getMACAdress();
 
   pinMode(POT_IN, INPUT);
   pinMode(BTN, INPUT_PULLDOWN);
 
   setAllZero();
 
+  //init_wifi();
+  //getMACAdress();
 }
 
 void loop() {
-  send();
-
-/*
-  while(1); // Testing with receiving data from the sensor glove
 
   currentTime = millis();
   char l = '0';  
@@ -276,6 +244,7 @@ void loop() {
       motors[CMC_TMB].angle_write(CMCangle);
       motors[IP_TMB].angle_write(2*CMCangle);
       motors[MCP_TMB].angle_write(2*CMCangle);
+
     
     }else if(currentTime < 11000){
       setAllZero();
@@ -293,6 +262,7 @@ void loop() {
       motors[IP_TMB].angle_write(0);
       motors[CMC_TMB].angle_write(0);
       motors[ABD_TMB].angle_write(0);
+
 
       if(currentTime % 4000 < 1000){
         motors[ABD_1].angle_write(-15);
@@ -338,5 +308,4 @@ void loop() {
     }
     delay(50);
   }
-  */
 }
