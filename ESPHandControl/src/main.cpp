@@ -1,6 +1,6 @@
 #include <Arduino.h>
-//#include <WiFi.h>
-//#include <esp_now.h>
+#include <WiFi.h>
+#include <esp_now.h>
 #include "MotorControl.h"
 #include "Wire.h"
 #include "angles.h"
@@ -78,73 +78,81 @@ MotorControl motors[16] = {
 //uint8_t broadcastAdress[] = {0X7C,0X9E,0XBD,0X61,0X58,0XF4}; //MAC till den med vit tejp
 uint8_t broadcastAdress[] = {0x94,0xB9,0x7E,0xE5,0x31,0xD8}; //MAC till Hand lolin
 
-// typedef struct struct_message{
-//   int sendID;
-//   float thumbIP;
-//   float thumbMCP;
-//   float finger1PIP;
-//   float finger1MCP;
-//   float finger2PIP;
-//   float finger2MCP;
-//   float finger3PIP;
-//   float finger3MCP;
-//   float finger4PIP;
-//   float finger4MCP;
-//   float thumbOpp;
-//   float test12;
-//   float test13;
-//   float test14;
-//   float test15;
-// }struct_message;
+typedef struct struct_message{
+  int sendID;
+  float thumbIP;
+  float thumbMCP;
+  float finger1PIP;
+  float finger1MCP;
+  float finger2PIP;
+  float finger2MCP;
+  float finger3PIP;
+  float finger3MCP;
+  float finger4PIP;
+  float finger4MCP;
+  float thumbOpp;
+  float finger1Pot;
+  float finger2Po;
+  float finger3Po;
+  float finger4Po;
+  float pot1;
+  float pot2;
+  float pot3;
+  float pot4;
+  float opposition;
+ }struct_message;
 
-// struct_message msg_to_send;
-// struct_message recv_data;
-// float joint_positions[8];
+
+struct_message msg_to_send;
+struct_message recv_data;
+float joint_positions[8];
 
 // // Callback when data is sent, triggered when something is sent
-// void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-//     Serial.print("\r\nLast Packet Send Status:\t");
-//     Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-// }
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+    Serial.print("\r\nLast Packet Send Status:\t");
+    Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
 
 // // Callback when data is received, triggered when something is recieved
-// void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-//   memcpy(&recv_data, incomingData, sizeof(recv_data));
-//   memcpy(&joint_positions, incomingData + 12, sizeof(joint_positions));
-//   //Serial.print("Bytes received: ");
-//   //Serial.println(len);
-// }
+void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+  memcpy(&recv_data, incomingData, sizeof(recv_data));
+  memcpy(&joint_positions, incomingData + 12, sizeof(joint_positions));
 
-// void getMACAdress(){
-//   WiFi.mode(WIFI_MODE_STA);
-//   Serial.println(WiFi.macAddress());
-// }
+  Serial.print("Bytes received: ");
+  Serial.println(len);
+}
 
-// void init_wifi (){
-//   WiFi.mode(WIFI_STA);
-//   if (esp_now_init() != ESP_OK) {
-//     Serial.println("Error initializing ESP-NOW");
-//     return;
-//   }
- 
-//   esp_now_register_send_cb(OnDataSent);
- 
-//   esp_now_peer_info_t peerInfo;
-//   memcpy(peerInfo.peer_addr, broadcastAdress, 6);
-//   peerInfo.channel = 0;  
-//   peerInfo.encrypt = false;
- 
-//   if (esp_now_add_peer(&peerInfo) != ESP_OK){
-//     Serial.println("Failed to add peer");
-//     return;
-//   }
-//   // Register for a callback function that will be called when data is received
-//   esp_now_register_recv_cb(OnDataRecv);
-// }
 
-// void send (){
-//   esp_now_send(0, (uint8_t *) &msg_to_send , sizeof(struct_message));
-// }
+void getMACAdress(){
+  WiFi.mode(WIFI_MODE_STA);
+  Serial.println(WiFi.macAddress());
+}
+
+void init_wifi (){
+  WiFi.mode(WIFI_STA);
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+ 
+  esp_now_register_send_cb(OnDataSent);
+ 
+  esp_now_peer_info_t peerInfo;
+  memcpy(peerInfo.peer_addr, broadcastAdress, 6);
+  peerInfo.channel = 0;  
+  peerInfo.encrypt = false;
+ 
+  // if (esp_now_add_peer(&peerInfo) != ESP_OK){
+  //   Serial.println("Failed to add peer");
+  //   return;
+  // }
+  // Register for a callback function that will be called when data is received
+  esp_now_register_recv_cb(OnDataRecv);
+}
+
+void send (){
+  esp_now_send(0, (uint8_t *) &msg_to_send , sizeof(struct_message));
+}
 
 void setAllZero(){
 
@@ -164,8 +172,9 @@ void setup() {
 
   setAllZero();
 
-  //init_wifi();
-  //getMACAdress();
+  init_wifi();
+  getMACAdress();
+
 }
 
 void loop() {
@@ -187,6 +196,10 @@ void loop() {
   }else if (l == '3'){
     mode = 3;
     Serial.println("Mode 3: demo");
+    delay(500);
+  }else if (l == '4'){
+    mode = 4;
+    Serial.println("Mode 4: glove");
     delay(500);
   }else if (mode == 1){
     // mode 1 = letters
@@ -307,5 +320,28 @@ void loop() {
       }
     }
     delay(50);
+  }else if(mode==4){
+
+    motors[IP_TMB].angle_write(recv_data.thumbIP);
+    motors[MCP_TMB].angle_write(recv_data.thumbIP);
+    motors[CMC_TMB].angle_write(recv_data.thumbMCP);
+    motors[PIP_1].angle_write(recv_data.finger1PIP);
+    motors[MCP_1].angle_write(recv_data.finger1MCP);
+    motors[PIP_2].angle_write(recv_data.finger2PIP);
+    motors[MCP_2].angle_write(recv_data.finger2MCP);
+    motors[PIP_3].angle_write(recv_data.finger3PIP);
+    motors[MCP_3].angle_write(recv_data.finger3MCP);
+    motors[PIP_4].angle_write(recv_data.finger4PIP);
+    motors[MCP_4].angle_write(recv_data.finger4MCP);
+  /*
+    motors[ABD_1].angle_write(recv_data.finger1Pot);
+    motors[ABD_2].angle_write(recv_data.finger2Po);
+    motors[ABD_3].angle_write(recv_data.finger3Po);
+    motors[ABD_4].angle_write(recv_data.finger4Po);
+    */
+    motors[ABD_1].angle_write(recv_data.finger1Pot);
+    motors[ABD_2].angle_write(0);
+    motors[ABD_3].angle_write(0);
+    motors[ABD_4].angle_write(0);
   }
 }
