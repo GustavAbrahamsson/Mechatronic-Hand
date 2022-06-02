@@ -1,0 +1,2 @@
+Palm2.0 was SLS printed, and FrontPalm1.2 was printed in an FDM printer with TPU plastic (not crucial though).
+Make sure that the channels in the palm don't get filled up with support material, and if you SLS print; the excess filament might be difficult to remove.

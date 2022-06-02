@@ -1,0 +1,1 @@
+Not used in the final design, only tested. Silicone fingertips are so much better, but the other parts made it look more similar to a real hand.

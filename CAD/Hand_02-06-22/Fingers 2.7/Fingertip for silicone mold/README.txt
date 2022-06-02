@@ -1,0 +1,1 @@
+Use this fingertip if you are going to cast silicone fingertips with the included molds

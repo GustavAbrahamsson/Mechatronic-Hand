@@ -1,0 +1,1 @@
+The Distal phalanges are similar for all four fingers, but there is either a straight one or a "T"-shaped one (used for silicone molded fingertip).
